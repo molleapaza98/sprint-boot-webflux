@@ -55,4 +55,32 @@ public class ProductController {
         model.addAttribute("title", "list product");
         return "list";
     }
+
+    @GetMapping("/list-full")
+    public String listFull(Model model){
+
+        Flux<Product> products = productDao.findAll()
+                .map(product -> {
+                    product.setName(product.getName().toUpperCase());
+                    return product;
+                }).repeat(5000);
+
+        model.addAttribute("products",products);
+        model.addAttribute("title", "list product");
+        return "list";
+    }
+
+    @GetMapping("/list-chunked")
+    public String listChunked(Model model){
+
+        Flux<Product> products = productDao.findAll()
+                .map(product -> {
+                    product.setName(product.getName().toUpperCase());
+                    return product;
+                }).repeat(5000);
+
+        model.addAttribute("products",products);
+        model.addAttribute("title", "list product");
+        return "list-chunked";
+    }
 }
