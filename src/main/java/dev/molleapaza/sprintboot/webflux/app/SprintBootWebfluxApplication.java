@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 
+import java.util.Date;
+
 @SpringBootApplication
 public class SprintBootWebfluxApplication implements CommandLineRunner {
 
@@ -43,7 +45,10 @@ public class SprintBootWebfluxApplication implements CommandLineRunner {
                 new Product("HP Notebook Omen 17",2500.89),
                 new Product("Apple TV 4K",2255.89),
                 new Product("TV Sony Bravia Oled 4k Ultra HD",150.89)
-        ).flatMap(productDao::save)
-        .subscribe(productMono -> log.info("Insert: " + productMono.getName()));
+        ).flatMap(product -> {
+                    product.setCreateAt(new Date());
+                    return productDao.save(product);
+                })
+        .subscribe(productMono -> log.info("Insert: " + productMono.getId() + productMono.getName()));
     }
 }
