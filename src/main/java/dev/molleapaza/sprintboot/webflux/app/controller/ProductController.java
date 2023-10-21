@@ -1,7 +1,10 @@
 package dev.molleapaza.sprintboot.webflux.app.controller;
 
+import dev.molleapaza.sprintboot.webflux.app.SprintBootWebfluxApplication;
 import dev.molleapaza.sprintboot.webflux.app.model.dao.ProductDao;
 import dev.molleapaza.sprintboot.webflux.app.model.document.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +12,8 @@ import reactor.core.publisher.Flux;
 
 @Controller
 public class ProductController {
+
+    private static final Logger log = LoggerFactory.getLogger(SprintBootWebfluxApplication.class);
 
     private final ProductDao productDao;
 
@@ -19,7 +24,14 @@ public class ProductController {
     @GetMapping({"/list","/"})
     public String list(Model model){
 
-        Flux<Product> products = productDao.findAll();
+        Flux<Product> products = productDao.findAll()
+                .map(product -> {
+                    product.setName(product.getName().toUpperCase());
+                    return product;
+                });
+
+        products.subscribe(prod -> log.info(prod.getName()));
+
         model.addAttribute("products",products);
         model.addAttribute("title", "list product");
         return "list";
